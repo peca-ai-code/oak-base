@@ -1,35 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.js
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
+
+// Auth components
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import PrivateRoute from './components/auth/PrivateRoute';
+
+// Main app components
+import NavBar from './components/layout/NavBar';
+import ChatInterface from './components/chat/ChatInterface';
+import ChatHistory from './components/chat/ChatHistory';
+import DoctorList from './components/doctors/DoctorList';
+import UserProfile from './components/user/UserProfile';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <NavBar />
+          <div className="container mt-4">
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Protected routes */}
+              <Route path="/" element={
+                <PrivateRoute>
+                  <ChatInterface />
+                </PrivateRoute>
+              } />
+              <Route path="/chat/:sessionId" element={
+                <PrivateRoute>
+                  <ChatInterface />
+                </PrivateRoute>
+              } />
+              <Route path="/history" element={
+                <PrivateRoute>
+                  <ChatHistory />
+                </PrivateRoute>
+              } />
+              <Route path="/doctors" element={
+                <PrivateRoute>
+                  <DoctorList />
+                </PrivateRoute>
+              } />
+              <Route path="/profile" element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              } />
+              
+              {/* Redirect any unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </div>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
